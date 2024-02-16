@@ -1,44 +1,65 @@
 const express = require('express');
-const { stringify } = require("querystring");
 const app = express();
 const port = 8888;
 const crypto = require('crypto');
+const { stringify } = require("querystring");
 const querystring = require('node:querystring');
-const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const Schema = mongoose.Schema;
+app.use(bodyParser.urlencoded({ extended: true }));
 
-//let users = JSON.parse(data);
-const User = Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
+const fs = require('fs');
+
+let users = fs.readFileSync('users.json');
+let datauser = JSON.parse(users);
+console.log(datauser);
+
+
+app.post('/register', (req, res) => {
+    const { pseudo, password } = req.body;
+
+    const userdata = datauser.find(user => user.pseudo === pseudo && user.password === password);
+
+    /*if (userdata) {
+        res.send(userdata);
+    }*/
+
+    const existingUser = datauser.find(user => user.pseudo === pseudo);
+    if (existingUser) {
+        return res.status(400).json({ message: 'Ce pseudo est déjà utilisé' });
+    }
+
+    // Vérifier si les données sont présentes
+    if (!pseudo || !password) {
+        return res.status(400).json({ message: 'Pseudo et mot de passe requis' });
+    }
+
+    // Charger les utilisateurs existants depuis le fichier users.json (s'il existe)
+    let users = [];
+    if (fs.existsSync('users.json')) {
+        const usersData = fs.readFileSync('users.json');
+        users = JSON.parse(usersData);
+    }
+
+    // Vérifier si l'utilisateur existe déjà
+
+
+    // Ajouter le nouvel utilisateur dans la liste
+    users.push({ pseudo: pseudo, password: password });
+    // Enregistrer les utilisateurs mis à jour dans le fichier users.json
+    fs.writeFileSync('users.json', JSON.stringify(users));
+
+    // Répondre avec succès
+    res.status(200).json({ message: 'Inscription réussie' });
 });
 
-module.exports = mongoose.model("User", User);
+app.get('/status', (request, response) => {
+    const status = {
+          'Status': 'Running',
+    };
 
-
-function generateRandomString(length) {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
-    return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-}
-
-const client_id = 'e5196a4107a54a1e89807459d6d9a10d';
-const redirect_uri = 'http://localhost:8888/callback';
-const client_secret = 'f56cc1bc736142708bf6b8fa4c930964';
-
-app.post('/signup', (req, res) => {
-
+    response.send(status);
 });
 
 app.listen(port, () => {
