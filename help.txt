@@ -1,8 +1,4 @@
-function generateRandomString(length) {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
-    return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-}
+
 
 const client_id = 'e5196a4107a54a1e89807459d6d9a10d';
 const redirect_uri = 'http://localhost:8888/callback';

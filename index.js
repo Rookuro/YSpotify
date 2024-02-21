@@ -3,7 +3,6 @@ const app = express();
 const port = 8888;
 const crypto = require('crypto');
 var jwt = require('jsonwebtoken');
-const { stringify } = require("querystring");
 const querystring = require('node:querystring');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
@@ -12,6 +11,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const fs = require('fs');
+const {stringify} = require("uuid");
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAna0ffx4JcSqAyE9qrzo8UCYgddPbsaN5mqAO8tuW8DOxE8ZO
@@ -51,18 +51,26 @@ kqBQUgK/qE1jW3V3zwhkjLcs5MoZsJ7E6eki4Da+JoY3+1sb3LQxLgxuag4HFcC+
 aQIDAQAB
 -----END PUBLIC KEY-----`
 
-let users = fs.readFileSync('users.json');
+const client_id = 'e5196a4107a54a1e89807459d6d9a10d';
+const redirect_uri = 'http://localhost:8888/callback';
+const client_secret = 'f56cc1bc736142708bf6b8fa4c930964';
+let users = fs.readFileSync('users.json', 'utf-8');
 let datauser = JSON.parse(users);
 console.log(datauser);
 
-function generateRandomId() {
-    // Générer un ID unique
-    const randomId = uuid.v4();
-
-    // Retourner l'ID généré
-    return randomId;
+function generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const values = crypto.getRandomValues(new Uint8Array(length));
+    return values.reduce((acc, x) => acc + possible[x % possible.length], "");
 }
 
+
+
+function generateRandomId() {
+    const randomId = uuid.v4();
+
+    return randomId;
+}
 
 app.post('/register', (req, res) => {
     const { pseudo, password } = req.body;
@@ -90,27 +98,53 @@ app.post('/register', (req, res) => {
     res.status(200).json({ message: 'Inscription réussie' });
 });
 
-app.post('/login', (req, res) => {
-    const { name, password } = req.body;
+app.get('/login', (req, res) => {
+    const state = generateRandomString(16);
+    const scope = 'user-read-private user-read-email';
+    const { pseudo, password } = req.body;
 
-    const user = users.find(user => user.name === name && user.password === password);
+    const user = datauser.find(user => user.pseudo === pseudo && user.password === password );
 
     if (user) {
-        const token = jwt.sign({ name: user.name, userId: user.id, admin: user.admin }, privateKey, {algorithm: 'RS256', expiresIn: '1d'});
+        const token = jwt.sign({ id: user.id, pseudo: user.pseudo}, privateKey, {algorithm: 'RS256', expiresIn: '1h'});
         res.set('Authorization', `Bearer ${token}`);
-        res.send(token);
-        res.status(200).json({ message: 'Connexion réussie' });
+        return res.redirect('https://accounts.spotify.com/authorize?' +
+        querystring.stringify({
+            response_type: 'code',
+            client_id: client_id,
+            scope: scope,
+            redirect_uri: redirect_uri,
+            state: state
+        }));
     } else {
         res.status(401).send("Erreur");
     }
 });
 
-app.get('/status', (request, response) => {
-    const status = {
-          'Status': 'Running',
-    };
+app.get('/callback', function(req, res) {
+    const code = req.query.code || null;
+    const state = req.query.state || null;
 
-    response.send(status);
+    if (state === null) {
+        res.redirect('/#' +
+        stringify({
+            error: 'state_mismatch'
+        }));
+    } else {
+        const authOptions = {
+            url: 'https://accounts.spotify.com/api/token',
+            form: {
+                code: code,
+                redirect_uri: redirect_uri,
+                grant_type: 'authorization_code'
+            },
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
+            },
+            json: true
+        };
+    }
 });
 
 app.listen(port, () => {
