@@ -1,0 +1,31 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "YSpotify"
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "S'Enregistrer",
+        "description": "Enregistrer un nouvel utilisateur",
+        "responses": {
+          "200": {
+            "description": "Opération réussie. Utilisateur enregistrer"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Se connecter",
+        "description": "Se connecter grâce au identifant dans la base de données ",
+        "responses": {
+          "200": {
+            "description": "Opération réussie. Utilisateur connecter"
+          }
+        }
+      }
+    }
+  }
+}

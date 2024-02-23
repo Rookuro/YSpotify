@@ -43,3 +43,16 @@ app.get('/callback', function(req, res) {
         };
     }
 });
+
+
+const { pseudo, password } = req.body;
+
+    const user = datauser.find(user => user.pseudo === pseudo && user.password === password );
+
+    if (user) {
+        const token = jwt.sign({ id: user.id, pseudo: user.pseudo}, privateKey, {algorithm: 'RS256', expiresIn: '1h'});
+        res.set('Authorization', `Bearer ${token}`);
+
+    } else {
+        res.status(401).send("Erreur");
+    }
