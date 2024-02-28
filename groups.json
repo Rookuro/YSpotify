@@ -1,0 +1,20 @@
+[
+  {
+    "name": "suede",
+    "chef": "peter",
+    "members": [
+      {
+        "name": "peter"
+      }
+    ]
+  },
+  {
+    "name": "afric",
+    "chef": "tim",
+    "members": [
+      {
+        "name": "tim"
+      }
+    ]
+  }
+]

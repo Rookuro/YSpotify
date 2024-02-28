@@ -1,31 +1,131 @@
 {
-  "openapi": "3.1.0",
+  "swagger": "2.0",
   "info": {
+    "description": "Service LINK API Spotify",
     "version": "1.0.0",
     "title": "YSpotify"
   },
+  "host": "localhost:8888",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Opérations d'authentification"
+    },
+    {
+      "name": "groups",
+      "description": "Gestion des groupes"
+    }
+  ],
+  "schemes": ["http"],
   "paths": {
     "/register": {
       "post": {
-        "summary": "S'Enregistrer",
-        "description": "Enregistrer un nouvel utilisateur",
+        "tags": ["auth"],
+        "summary": "Inscription d'un utilisateur",
+        "description": "",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objet utilisateur nécessaire à l'inscription",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Opération réussie. Utilisateur enregistrer"
+            "description": "Inscription réussie"
+          },
+          "400": {
+            "description": "Erreur de requête"
           }
         }
       }
     },
     "/login": {
-      "post": {
-        "summary": "Se connecter",
-        "description": "Se connecter grâce au identifant dans la base de données ",
+      "get": {
+        "tags": ["auth"],
+        "summary": "Connexion d'un utilisateur",
+        "description": "",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "pseudo",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Opération réussie. Utilisateur connecter"
+            "description": "Connexion réussie",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "Non autorisé"
           }
         }
       }
+    },
+    "/groups": {
+      "post": {
+        "tags": ["groups"],
+        "summary": "Créer ou rejoindre un groupe",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Nom du groupe à rejoindre ou à créer",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Group"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Opération réussie"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "pseudo": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": ["pseudo", "password"]
+    },
+    "Group": {
+      "type": "object",
+      "properties": {
+        "groupName": {
+          "type": "string"
+        }
+      },
+      "required": ["groupName"]
     }
   }
 }
