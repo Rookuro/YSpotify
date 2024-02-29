@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "swagger": "node ./swagger.js",
     "start": "nodemon --quiet index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
@@ -19,6 +21,7 @@
     "querystring": "^0.2.1",
     "request": "^2.88.2",
     "spotify-web-api-node": "^5.0.2",
+    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1"
   },

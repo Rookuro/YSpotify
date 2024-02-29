@@ -16,5 +16,14 @@
         "name": "tim"
       }
     ]
+  },
+  {
+    "name": "alex",
+    "chef": "alexis",
+    "members": [
+      {
+        "name": "alexis"
+      }
+    ]
   }
 ]

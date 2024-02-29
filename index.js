@@ -8,8 +8,9 @@ const jwt = require('jsonwebtoken');
 
 const path = require('path');
 
-const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
+const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 const bodyParser = require('body-parser');
@@ -179,13 +180,15 @@ app.post('/register', (req, res) => {
         return res.status(400).json({ message: 'Pseudo et mot de passe requis' });
     }
 
+    const hashedPassword = bcrypt.hash(password, saltRounds);
+
     let users = [];
     if (fs.existsSync('users.json')) {
         const usersData = fs.readFileSync('users.json');
         users = JSON.parse(usersData);
     }
 
-    users.push({ id: id, pseudo: pseudo, password: password  });
+    users.push({ id: users.length + 1, pseudo: pseudo, password: hashedPassword });
     fs.writeFileSync('users.json', JSON.stringify(users));
 
     res.status(200).json({ message: 'Inscription réussie' });
@@ -243,52 +246,7 @@ app.get('/callback', function(req, res) {
         request.post(authOptions, function(error, response, body) {
             if (!error && response.statusCode === 200) {
                 const accessToken = body.access_token;
-
                 console.log('Access Token:', accessToken);
-
-            }
-        });
-
-        request.get('https://api.spotify.com/v1/me', {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        }, function(error, response, body) {
-            if (!error && response.statusCode === 200) {
-                const username = JSON.parse(body).display_name;
-                console.log('Pseudo du compte Spotify associé:', username);
-            } else {
-            }
-        });
-
-        request.get('https://api.spotify.com/v1/me/player/currently-playing', {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        }, function(error, response, body) {
-            if (!error && response.statusCode === 200) {
-                const track = JSON.parse(body).item;
-                const artist = track.artists[0].name;
-                const trackName = track.name;
-                const albumName = track.album.name;
-
-                console.log('Titre du morceau:', trackName);
-                console.log('Nom de l\'artiste:', artist);
-                console.log('Titre de l\'album:', albumName);
-            } else {
-            }
-        });
-
-        request.get('https://api.spotify.com/v1/me/player', {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            }
-        }, function(error, response, body) {
-            if (!error && response.statusCode === 200) {
-                const deviceName = JSON.parse(body).device.name;
-                console.log('Nom de l\'appareil d\'écoute actif:', deviceName);
-            } else {
-
             }
         });
     }
