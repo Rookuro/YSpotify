@@ -1,12 +1,12 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "YSpotify",
     "description": "Service use API Spotify",
     "version": "1.0.0"
   },
   "host": "localhost:8888",
-  "basePath": "/api-docs",
+  "basePath": "/api",
   "schemes": [
     "http"
   ],

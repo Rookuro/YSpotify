@@ -5,7 +5,7 @@ const doc = {
         title: 'YSpotify',
         description: 'Service use API Spotify'
     },
-    host: 'localhost:8888/api-docs'
+    host: 'localhost:8888'
 };
 
 const outputFile = './swagger-output.json';

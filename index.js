@@ -20,7 +20,7 @@ const {stringify} = require("nodemon/lib/utils");
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
+const swaggerDocument = require('./swagger-output.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
