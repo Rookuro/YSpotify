@@ -180,15 +180,13 @@ app.post('/register', (req, res) => {
         return res.status(400).json({ message: 'Pseudo et mot de passe requis' });
     }
 
-    const hashedPassword = bcrypt.hash(password, saltRounds);
-
     let users = [];
     if (fs.existsSync('users.json')) {
         const usersData = fs.readFileSync('users.json');
         users = JSON.parse(usersData);
     }
 
-    users.push({ id: users.length + 1, pseudo: pseudo, password: hashedPassword });
+    users.push({ id: id, pseudo: pseudo, password: password  });
     fs.writeFileSync('users.json', JSON.stringify(users));
 
     res.status(200).json({ message: 'Inscription réussie' });
